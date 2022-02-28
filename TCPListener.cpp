@@ -47,7 +47,13 @@ int TCPListener::init()
 
 	return 0;
 }
+int TCPListener::mainLoop()
+{
 
+
+
+	return 0;
+}
 int TCPListener::run()
 {
 	// this will be changed by the \quit command (see below, bonus not in video!)
@@ -78,7 +84,7 @@ int TCPListener::run()
 			// Makes things easy for us doing this assignment
 			SOCKET sock = copy.fd_array[i];
 
-			// Is it an inbound communication?
+			// Is it an inbound communication?=
 			if (sock == m_socket)
 			{
 				// Accept a new connection
@@ -93,6 +99,38 @@ int TCPListener::run()
 			{
 				char buf[4096];
 				ZeroMemory(buf, 4096);
+
+				std::getline(std::cin, response);
+				option = response.substr(0, response.find(" "));
+				if (strcmp(option.c_str(), "help"))
+				{
+					// Help option
+				}
+				else if (strcmp(option.c_str(), "myip"))
+				{
+					// Myip option
+				}
+				else if (strcmp(option.c_str(), "myport"))
+				{
+					// Myport option
+				}
+				else if (strcmp(option.c_str(), "connect"))
+				{
+					// Connect option
+				}
+				else if (strcmp(option.c_str(), "terminate"))
+				{
+					// Terminate option
+				}
+				else if (strcmp(option.c_str(), "send"))
+				{
+					// Send option
+				}
+				else if (strcmp(option.c_str(), "exit"))
+				{
+					// Exit option
+				}
+
 
 				// Receive message
 				int bytesIn = recv(sock, buf, 4096, 0);
@@ -140,11 +178,11 @@ void TCPListener::sendToClient(int clientSocket, const char* msg, int length)//c
 void TCPListener::findClient(int sendingClient, const char* msg, int length, int CI)
 {
 	//send to specified client
-	if(m_master.fd_array[CI] != m_socket && m_master.fd_array[CI] != sendingClient) {
+	if (m_master.fd_array[CI] != m_socket && m_master.fd_array[CI] != sendingClient) {
 		SOCKET outSock = m_master.fd_array[CI];
 		sendToClient(outSock, msg, length);
 	}
-	
+
 	//for (int i = 0; i < m_master.fd_count; i++)
 	//{
 	//	SOCKET outSock = m_master.fd_array[i];
@@ -170,3 +208,15 @@ void TCPListener::onMessageReceived(int clientSocket, const char* msg, int lengt
 
 }
 
+void TCPListener::onHelp(int clientSocket) {
+	std::string welcomeMsg = "Welcome to the Awesome Chat Server!\r\n";
+	std::cout << "Options:\n"
+        << "help: brings up list of all commands available.\n"
+        << "myip: Displays IP address of current process.\n"
+        << "myport: Displays the port that this process is listening to for connections.\n"
+        << "connect <destination> <port number>: Establishes new connection to specified destination at specified port.\n"
+        << "list: Lists all currently connected connection id's and associated port numbers.\n"
+        << "terminate <connection id>: Terminates specified connection.\n"
+        << "send <connection id> <message>: Sends a message (up to 100 bytes) to specified host.\n"
+        << "exit: Closes all connections and ends the process.\n";
+}
