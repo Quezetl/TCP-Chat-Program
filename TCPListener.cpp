@@ -1,7 +1,7 @@
-#include "TcpListener.h"
+#include "TCPListener.h"
 
 
-int TcpListener::init()
+int TCPListener::init()
 {
 	// Initialze winsock
 	WSADATA wsData;
@@ -48,7 +48,7 @@ int TcpListener::init()
 	return 0;
 }
 
-int TcpListener::run()
+int TCPListener::run()
 {
 	// this will be changed by the \quit command (see below, bonus not in video!)
 	bool running = true;
@@ -105,12 +105,12 @@ int TcpListener::run()
 				}
 				else
 				{
-					onMessageReceived(sock, buf, bytesIn);
+					onMessageReceived(sock, buf, bytesIn, 1);
 				}
 			}
 		}
 	}
-
+	//termination
 	// Remove the listening socket from the master file descriptor set and close it
 	// to prevent anyone else trying to connect.
 	FD_CLR(m_socket, &m_master);
@@ -132,34 +132,41 @@ int TcpListener::run()
 }
 
 
-void TcpListener::sendToClient(int clientSocket, const char* msg, int length)
+void TCPListener::sendToClient(int clientSocket, const char* msg, int length)//client first connects to the server
 {
 	send(clientSocket, msg, length, 0);
 }
 
-void TcpListener::broadcastToClients(int sendingClient, const char* msg, int length)
+void TCPListener::findClient(int sendingClient, const char* msg, int length, int CI)
 {
-	for (int i = 0; i < m_master.fd_count; i++)
-	{
-		SOCKET outSock = m_master.fd_array[i];
-		if (outSock != m_socket && outSock != sendingClient)
-		{
-			sendToClient(outSock, msg, length);
-		}
+	//send to specified client
+	if(m_master.fd_array[CI] != m_socket && m_master.fd_array[CI] != sendingClient) {
+		SOCKET outSock = m_master.fd_array[CI];
+		sendToClient(outSock, msg, length);
 	}
+	
+	//for (int i = 0; i < m_master.fd_count; i++)
+	//{
+	//	SOCKET outSock = m_master.fd_array[i];
+	//	if (outSock != m_socket && outSock != sendingClient)
+	//	{
+	//		sendToClient(outSock, msg, length);
+	//	}
+	//}
 }
 
-void TcpListener::onClientConnected(int clientSocket)
+void TCPListener::onClientConnected(int clientSocket)
 {
 
 }
 
-void TcpListener::onClientDisconnected(int clientSocket)
+void TCPListener::onClientDisconnected(int clientSocket)
 {
 
 }
 
-void TcpListener::onMessageReceived(int clientSocket, const char* msg, int length)
+void TCPListener::onMessageReceived(int clientSocket, const char* msg, int length, int CI)
 {
 
 }
+
