@@ -1,18 +1,14 @@
-#pragma once
-
-#include <iostream>
-#include <WS2tcpip.h>
 #include <string>
 #include <sstream>
 
 #pragma comment (lib, "ws2_32.lib")
 
-class TcpListener
+class TCPListener
 {
 
 public:
 
-	TcpListener(const char* ipAddress, int port) :
+	TCPListener(const char* ipAddress, int port) :
 		m_ipAddress(ipAddress), m_port(port) { }
 
 	// Initialize the listener
@@ -30,13 +26,13 @@ protected:
 	virtual void onClientDisconnected(int clientSocket);
 
 	// Handler for when a message is received from the client
-	virtual void onMessageReceived(int clientSocket, const char* msg, int length);
+	virtual void onMessageReceived(int clientSocket, const char* msg, int length, int CI);
 
 	// Send a message to a client
 	void sendToClient(int clientSocket, const char* msg, int length);
 
 	// Broadcast a message from a client
-	void broadcastToClients(int sendingClient, const char* msg, int length);
+	void findClient(int sendingClient, const char* msg, int length, int CI);
 
 private:
 
