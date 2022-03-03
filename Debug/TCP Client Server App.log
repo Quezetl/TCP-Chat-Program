@@ -1,0 +1,11 @@
+﻿  TCP Client Server App.cpp
+  tsock.cpp
+C:\Users\bjsbe\source\repos\TCP Client Server App\tsock.cpp(217,19): warning C4018: '<': signed/unsigned mismatch
+C:\Users\bjsbe\source\repos\TCP Client Server App\tsock.cpp(219,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\bjsbe\source\repos\TCP Client Server App\tsock.cpp(229,9): warning C4018: '>': signed/unsigned mismatch
+C:\Users\bjsbe\source\repos\TCP Client Server App\tsock.cpp(249,9): warning C4018: '>': signed/unsigned mismatch
+C:\Users\bjsbe\source\repos\TCP Client Server App\tsock.cpp(269,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\bjsbe\source\repos\TCP Client Server App\tsock.cpp(283,20): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+C:\Users\bjsbe\source\repos\TCP Client Server App\tsock.cpp(245): warning C4715: 'tsock::Terminate': not all control paths return a value
+  TCP Client Server App.vcxproj -> C:\Users\bjsbe\source\repos\TCP Client Server App\Debug\TCP Client Server App.exe
