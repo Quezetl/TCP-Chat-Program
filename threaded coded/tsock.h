@@ -4,6 +4,7 @@
 #include <WinSock2.h>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <Windows.h>
 #include <ws2tcpip.h>
 #include <vector>
@@ -35,19 +36,20 @@ protected:
 private:
 	int							EC;
 	int							sendEC;
-	char*	msg[100];
+	char					   *msg[100];
 	char						servermsg[100];
 	string						Clientport;
 	string						Serverport;
-	addrinfo* sRes,
-		* cRes,
-		* cPtr,
-		* sPtr,
-		sHint,
-		cHint;
+	addrinfo				   *sRes,
+							   *cRes,
+							   *cPtr,
+							   *sPtr,
+								sHint,
+								cHint;
 	SOCKET						Listen;
 	vector<SOCKET>				Connection;
 	vector<SOCKET>				ClientSock;
 	vector<vector<string>>		ClientsInfo;
 
 };
+
