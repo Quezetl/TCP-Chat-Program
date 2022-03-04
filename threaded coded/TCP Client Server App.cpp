@@ -19,9 +19,10 @@ int main(int argc, char *argv[])
     string response;
     string choice;
     bool quit = false;
-    tsock App("29015");
+    tsock App("21015");
     App.Server_init();
     App.serverListen();
+
     do
     {
         thread worker(accepting, App);
