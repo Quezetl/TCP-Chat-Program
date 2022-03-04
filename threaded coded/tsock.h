@@ -36,10 +36,18 @@ protected:
 private:
 	int							EC;
 	int							sendEC;
+	int							offset;
 	char					   *msg[100];
 	char						servermsg[100];
 	string						Clientport;
 	string						Serverport;
+	string						IPADD;
+	string						line;
+	string						search0;
+	string						cIP;
+	string						cPort;
+	string						msg;
+	ifstream					IPFile;
 	addrinfo				   *sRes,
 							   *cRes,
 							   *cPtr,
@@ -50,6 +58,5 @@ private:
 	vector<SOCKET>				Connection;
 	vector<SOCKET>				ClientSock;
 	vector<vector<string>>		ClientsInfo;
-
 };
 
