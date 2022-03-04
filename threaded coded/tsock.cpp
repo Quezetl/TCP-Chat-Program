@@ -1,3 +1,5 @@
+#include "tsock.h"
+
 tsock::tsock(string port)
 {
 	// Initiate variables
