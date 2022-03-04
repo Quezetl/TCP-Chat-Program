@@ -6,10 +6,11 @@
 #include <iostream>
 #include <Windows.h>
 #include <ws2tcpip.h>
-#include <thread>
+#include <vector>
+#include <iomanip>
+#include <stdio.h>
 
 #pragma comment(lib, "Ws2_32.lib")
-
 using namespace std;
 
 class tsock
@@ -17,7 +18,6 @@ class tsock
 public:
 	tsock(string port);
 	int Server_init();
-	int Client_init(string ip, string prt);
 	int serverListen();
 	int serverAccept();
 	int display();
@@ -26,30 +26,28 @@ public:
 	void Myport();
 	int Connect(string dest, string prt);
 	void List();
-	void Terminate();
+	int Terminate(int id);
 	int Send(int id, string message);
 	int Exit();
 
 protected:
 
 private:
-	int			EC;
-	int			sendEC;
-	char       *msg[100];
-	char		servermsg[100];
-	string		Ipadd;
-	string		Clientport;
-	string		Serverport;
-	addrinfo   *sRes,
-			   *cRes,
-			   *cPtr,
-				sHint,
-				cHint;
-				
-	SOCKET		Listen,
-				Search,
-				Connection,
-				Receive;
+	int							EC;
+	int							sendEC;
+	char*	msg[100];
+	char						servermsg[100];
+	string						Clientport;
+	string						Serverport;
+	addrinfo* sRes,
+		* cRes,
+		* cPtr,
+		* sPtr,
+		sHint,
+		cHint;
+	SOCKET						Listen;
+	vector<SOCKET>				Connection;
+	vector<SOCKET>				ClientSock;
+	vector<vector<string>>		ClientsInfo;
 
 };
-
