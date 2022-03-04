@@ -4,6 +4,8 @@
 #include <WinSock2.h>
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <istream>
 #include <Windows.h>
 #include <ws2tcpip.h>
 #include <vector>

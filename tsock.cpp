@@ -49,7 +49,7 @@ int tsock::Server_init()
 	EC = bind(Listen, sRes->ai_addr, sRes->ai_addrlen);
 	if (EC == SOCKET_ERROR)
 	{
-		cout << "Binding for Server has failed: " << WSAGetLastError() << endl;
+		cout << "Binding on port: " << Serverport << "has failed\nError code: "<< WSAGetLastError() << endl;
 		freeaddrinfo(sRes);
 		closesocket(Listen);
 		WSACleanup();
@@ -78,13 +78,16 @@ int tsock::serverListen()
 
 int tsock::serverAccept()
 {	
-
-	Connection.push_back(accept(Listen, NULL, NULL));
+	addrinfo r;
+	ZeroMemory(&r, sizeof(r)); 
+	r.ai_family = AF_UNSPEC;
+	r.ai_socktype = SOCK_STREAM;
+	r.ai_protocol = IPPROTO_TCP;
+	Connection.push_back(accept(Listen, r.ai_addr,(int*)r.ai_addrlen));
+	cout << r.ai_addr;
 	if (Connection.back() == INVALID_SOCKET)
 	{
 		cout << "accept failed: " << WSAGetLastError();
-		closesocket(Listen);
-		WSACleanup();
 		return 1;
 	}
 	//
@@ -107,17 +110,15 @@ int tsock::display()
 			{
 				cout << "Confirmation failed to send: " << WSAGetLastError();
 				closesocket(Connection.back());
-				WSACleanup();
 				return 1;
 			}
 		}
 		else if (EC == 0)
-			cout << "Connection closing\n";
+			cout << "Connection closing from: \n" << Connection.back();
 		else
 		{
 			cout << "Receiving failed: " << WSAGetLastError();
 			closesocket(Connection.back());
-			WSACleanup();
 			return 1;
 		}
 	} while (EC > 0);
@@ -140,8 +141,29 @@ void tsock::Help()
 void tsock::Myip()
 {
 
+	string line;
+	ifstream IPFile;
+	int offset;
+	string search0 = "IPv4 Address. . . . . . . . . . . :";      // search pattern
 
+	system("ipconfig > ip.txt");
 
+	IPFile.open("ip.txt");
+	if (IPFile.is_open())
+	{
+		while (!IPFile.eof())
+		{
+			getline(IPFile, line);
+			if ((offset = line.find(search0.c_str(), 0)) != string::npos)
+			{
+				//   IPv4 Address. . . . . . . . . . . : 1
+				//1234567890123456789012345678901234567890     
+				line.erase(0, 39);
+				cout << line << endl;
+				IPFile.close();
+			}
+		}
+	}
 }
 
 void tsock::Myport()
@@ -173,8 +195,6 @@ int tsock::Connect(string dest, string prt)
 	if (ClientSock.back() == SOCKET_ERROR)
 	{
 		cout << "Error at the client side socket: " << WSAGetLastError() << endl;
-		freeaddrinfo(cRes);
-		WSACleanup();
 		return 1;
 	}
 	EC = connect(ClientSock.back(), cPtr->ai_addr, int(cPtr->ai_addrlen));
@@ -182,8 +202,6 @@ int tsock::Connect(string dest, string prt)
 	{
 		cout << "Connection to the server has failed";
 		closesocket(ClientSock.back());
-		freeaddrinfo(cRes);
-		WSACleanup();
 		return 1;
 	}
 	
@@ -192,7 +210,6 @@ int tsock::Connect(string dest, string prt)
 	if (ClientSock.back() == INVALID_SOCKET)
 	{
 		cout << "unable to connect to server!\n";
-		WSACleanup();
 		return 1;
 	}
 
@@ -209,17 +226,21 @@ int tsock::Connect(string dest, string prt)
 
 void tsock::List()
 {
-	cout << "Id: ";
-	cout.width(10);
+	cout.width(3);
+	cout << "Id:";
+	cout.width(17);
  	cout << "IP Address:";
-	cout.width(10);
+	cout.width(12);
 	cout << "Port No.\n";
-	for(int i = 0; i < ClientsInfo.size(); i++){
-		cout << i + 1;
-		for (int j = 0; j < ClientsInfo[i].size(); j++) {
- 				cout.width(10);
-				cout << ClientsInfo[i][j];//ip addreess - port
-			}
+	for(int i = 0; i < ClientsInfo.size(); i++)
+	{
+		cout.width(3);
+		cout << right << i + 1;
+		cout.width(17);
+		cout << right << ClientsInfo[i][0];
+		cout.width(11);
+		cout << right << ClientsInfo[i][1];
+		cout << endl;
 	}
 	cout << endl << endl;
 }
@@ -241,7 +262,7 @@ int tsock::Terminate(int id)
 	closesocket(ClientSock.at(id - 1));
 	ClientSock.erase(ClientSock.begin() + id - 1);
 	ClientsInfo.erase(ClientsInfo.begin() + id - 1);
-
+	return 0;
 }
 
 int tsock::Send(int id, string message)
@@ -256,8 +277,6 @@ int tsock::Send(int id, string message)
 	if (EC == SOCKET_ERROR)
 	{
 		cout << "Send failed: " << WSAGetLastError();
-		closesocket(Listen);
-		WSACleanup();
 		return 1;
 	}
 	cout << "Message sent\n\n";

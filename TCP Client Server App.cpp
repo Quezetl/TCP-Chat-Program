@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     string response;
     string choice;
     bool quit = false;
-    tsock App("29015");
+    tsock App("27015");
     App.Server_init();
     App.serverListen();
     do
