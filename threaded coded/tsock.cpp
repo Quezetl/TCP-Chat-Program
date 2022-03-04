@@ -17,7 +17,6 @@ tsock::tsock(string port)
 		cout << "wsaStartup has failed:" << endl;
 }
 
-//initiates server side
 int tsock::Server_init()
 {
 	// Sets up ip address info
@@ -40,7 +39,7 @@ int tsock::Server_init()
 
 	// Sets up listening socket for server
 	Listen = socket(sRes->ai_family, sRes->ai_socktype, sRes->ai_protocol);
-	
+
 	// Error check
 	if (Listen == INVALID_SOCKET)
 	{
@@ -63,40 +62,26 @@ int tsock::Server_init()
 		return 1;
 	}
 
-	//char ipstringbuffer[46];
-	//DWORD ipbufferlength = 46;
-	//DWORD dwRetval;
-
-	//struct sockaddr_in* sockaddr_ipv4;
-	//struct addrinfo* result = NULL;
-	//struct addrinfo* ptr = NULL;
-	//struct addrinfo hints;
-
-	//dwRetval = getaddrinfo(NULL, Serverport.c_str(), &hints, &result);
-	//sockaddr_ipv4 = (struct sockaddr_in*)ptr->ai_addr;
-	//printf("\tIPv4 address %s\n", inet_ntoa(sockaddr_ipv4->sin_addr)); 
-
 
 	freeaddrinfo(sRes);
 	return 0;
 }
 
-// Listens for a client connection
+
 int tsock::serverListen()
 {
 	// Error check
 	if (listen(Listen, SOMAXCONN) == SOCKET_ERROR)
 	{
 		cout << "Listen failed with error:" << WSAGetLastError() << endl;
-		closesocket(Listen);
-		WSACleanup();
 		return 1;
 	}
 
 	return 0;
+
+	return 0;
 }
 
-// Accepts a Connection and adds it to a vector of connections
 int tsock::serverAccept()
 {
 	// Adds the newly connected client into the Connection vector
@@ -106,16 +91,13 @@ int tsock::serverAccept()
 	if (Connection.back() == INVALID_SOCKET)
 	{
 		cout << "Failed to accept connection:" << WSAGetLastError() << endl;
-		closesocket(Listen);
-		WSACleanup();
 		return 1;
 	}
-	
+
 	display();
 	return 0;
 }
 
-// General message sending and receiving
 int tsock::display()
 {
 	do
@@ -125,7 +107,7 @@ int tsock::display()
 		if (EC > 0)
 		{
 			// Confirmation message sent to the client
-			cout << setw(10) << "Message:" << servermsg << endl;
+			cout << setw(10) <<"Message:" << servermsg << endl;
 
 			// Error check
 			sendEC = send(Connection.back(), "Message Received:", EC, 0);
@@ -133,7 +115,6 @@ int tsock::display()
 			{
 				cout << "Confirmation failed to send:\n" << WSAGetLastError();
 				closesocket(Connection.back());
-				WSACleanup();
 				return 1;
 			}
 		}
@@ -143,39 +124,58 @@ int tsock::display()
 		{
 			cout << "Failed to receive message:\n" << WSAGetLastError();
 			closesocket(Connection.back());
-			WSACleanup();
 			return 1;
 		}
 	} while (EC > 0);
 	return 0;
 }
 
+
 // Prints the Help command
 void tsock::Help()
 {
 	cout << "Options:\n"
-		<< "Help: Brings up list of all commands available.\n"
-		<< "Myip: Displays IP address of current process.\n"
-		<< "Myport: Displays the port that this process is listening to for connections.\n"
-		<< "Connect <destination> <port number>: Establishes new connection to specified destination at specified port.\n"
-		<< "List: Lists all currently connected connection id's and associated port numbers.\n"
-		<< "Terminate <connection id>: Terminates specified connection.\n"
-		<< "Send <connection id> <message>: Sends a message (up to 100 bytes) to specified host.\n"
-		<< "Exit: Closes all connections and ends the process.\n\n";
+		<< "help: brings up list of all commands available.\n"
+		<< "myip: Displays IP address of current process.\n"
+		<< "myport: Displays the port that this process is listening to for connections.\n"
+		<< "connect <destination> <port number>: Establishes new connection to specified destination at specified port.\n"
+		<< "list: Lists all currently connected connection id's and associated port numbers.\n"
+		<< "terminate <connection id>: Terminates specified connection.\n"
+		<< "send <connection id> <message>: Sends a message (up to 100 bytes) to specified host.\n"
+		<< "exit: Closes all connections and ends the process.\n\n";
 }
 
-//IN Progress
 void tsock::Myip()
 {
+	string line;
+	ifstream IPFile;
+	int offset;
+	string search0 = "IPv4 Address. . . . . . . . . . . :";      // search pattern
 
+	system("ipconfig > ip.txt");
 
-
+	IPFile.open("ip.txt");
+	if (IPFile.is_open())
+	{
+		while (!IPFile.eof())
+		{
+			getline(IPFile, line);
+			if ((offset = line.find(search0.c_str(), 0)) != string::npos)
+			{
+				//   IPv4 Address. . . . . . . . . . . : 1
+				//1234567890123456789012345678901234567890     
+				line.erase(0, 39);
+				cout << line << endl;
+				IPFile.close();
+			}
+		}
+	}
 }
 
 // Prints the client's port
 void tsock::Myport()
 {
-	cout << "Current listening port: " << setw(10) << Serverport << endl << endl;
+	cout << "Current listening port: " << Serverport << endl << endl;
 }
 
 // Makes a connection between clinets
@@ -209,7 +209,6 @@ int tsock::Connect(string dest, string prt)
 	{
 		cout << "Error at the client side socket: " << WSAGetLastError() << endl;
 		freeaddrinfo(cRes);
-		WSACleanup();
 		return 1;
 	}
 
@@ -219,8 +218,6 @@ int tsock::Connect(string dest, string prt)
 	{
 		cout << "Connection to the server has failed";
 		closesocket(ClientSock.back());
-		freeaddrinfo(cRes);
-		WSACleanup();
 		return 1;
 	}
 
@@ -230,7 +227,6 @@ int tsock::Connect(string dest, string prt)
 	if (ClientSock.back() == INVALID_SOCKET)
 	{
 		cout << "Unable to connect to server!\n";
-		WSACleanup();
 		return 1;
 	}
 
@@ -251,18 +247,19 @@ int tsock::Connect(string dest, string prt)
 // Displays a list of currently connected clients
 void tsock::List()
 {
-	cout << "Id:" << setw(13) << "IP Adress" 
+	cout << "Id:" << setw(13) << "IP Adress"
 		<< setw(13) << "Port No." << endl;
 
 	for (int i = 0; i < ClientsInfo.size(); i++) {
-		cout << setw(13) << i + 1;
+		cout << i + 1 << setw(13);
 
 		// Prints IP addresses and port numbers
 		for (int j = 0; j < ClientsInfo[i].size(); j++)
 			cout << setw(13) << ClientsInfo[i][j];
-		
+
 	}
 	cout << endl << endl;
+
 }
 
 //Terminates a selected connection
@@ -291,6 +288,7 @@ int tsock::Terminate(int id)
 
 }
 
+
 // Sends a message to a selected client
 int tsock::Send(int id, string message)
 {
@@ -307,8 +305,6 @@ int tsock::Send(int id, string message)
 	if (EC == SOCKET_ERROR)
 	{
 		cout << "Send failed: " << WSAGetLastError();
-		closesocket(Listen);
-		WSACleanup();
 		return 1;
 	}
 
@@ -354,3 +350,4 @@ int tsock::Exit()
 	WSACleanup();
 	return 0;
 }
+
