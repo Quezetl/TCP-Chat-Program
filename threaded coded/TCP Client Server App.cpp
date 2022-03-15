@@ -7,28 +7,23 @@
 
 using namespace std;
 
-int Run(string &response, string choice, tsock &App);
-int accepting(tsock App)
-{
-    App.serverAccept();
-    return 0;
-}
+int Run(string& response, string choice, tsock& App);
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
+    tsock App("2015");
     string response;
     string choice;
     bool quit = false;
-    tsock App("21015");
     App.Server_init();
     App.serverListen();
 
     do
     {
-        thread worker(accepting, App);
+        thread worker(&tsock::serverAccept,&App);
         getline(cin, response);
         choice = response.substr(0, response.find(' '));
-        response.erase(0,choice.size()+1);
+        response.erase(0, choice.size() + 1);
         quit = Run(response, choice, App);
         worker.detach();
     } while (!quit);
@@ -36,10 +31,10 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-int Run(string &response, string choice, tsock &App)
+int Run(string& response, string choice, tsock& App)
 {
     string first = response.substr(0, response.find(' '));
-    response.erase(0, first.size()+1);
+    response.erase(0, first.size() + 1);
     if (choice == "accept")
         App.serverAccept();
     if (choice == "help")
