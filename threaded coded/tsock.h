@@ -37,7 +37,6 @@ private:
 	int							EC;
 	int							sendEC;
 	int							offset;
-	char					   *msg[100];
 	char						servermsg[100];
 	string						Clientport;
 	string						Serverport;
@@ -48,15 +47,14 @@ private:
 	string						cPort;
 	string						msg;
 	ifstream					IPFile;
-	addrinfo				   *sRes,
-							   *cRes,
-							   *cPtr,
-							   *sPtr,
-								sHint,
-								cHint;
+	addrinfo* sRes,
+		* cRes,
+		* cPtr,
+		* sPtr,
+		sHint,
+		cHint;
 	SOCKET						Listen;
 	vector<SOCKET>				Connection;
 	vector<SOCKET>				ClientSock;
 	vector<vector<string>>		ClientsInfo;
 };
-
