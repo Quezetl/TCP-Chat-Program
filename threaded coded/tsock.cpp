@@ -12,12 +12,12 @@ tsock::tsock(string port)
 	search0 = "IPv4 Address. . . . . . . . . . . :";
 
 	EC = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	
+
 	// Error check
 	if (EC != 0)
 		cout << "wsaStartup has failed:" << endl;
 
-	
+
 
 	system("ipconfig > ip.txt");
 
@@ -108,17 +108,32 @@ int tsock::serverAccept()
 {
 	// Adds the newly connected client into the Connection vector
 	Connection.push_back(accept(Listen, NULL, NULL));
-
+	bool ipcheck=false,
+		 portcheck = false;
 	// Error check
 	if (Connection.back() == INVALID_SOCKET && Connection.size() > 1)
 	{
 		cout << "Failed to connect: " << WSAGetLastError() << endl;
 		return 1;
 	}
-	else if(Connection.back() != INVALID_SOCKET)
+	else if (Connection.back() != INVALID_SOCKET)
 	{
 		// Notify client that someone has connected
-		cout << "Someone has connected to you!" << endl; 
+		cout << "Someone has connected to you!" << endl;
+		EC = recv(Connection.back(), servermsg, 100, 0);
+		msg = servermsg;
+		cIP = msg.substr(0, msg.find(' '));
+		msg.erase(0, cIP.size() + 1);
+		cPort = msg.substr(0, msg.find(' '));
+		for (int i = 0; i < ClientsInfo.size(); i++)
+		{
+			if (ClientsInfo[i][0] == cIP)
+				ipcheck = true;
+			if (ClientsInfo[i][1] == cPort)
+				portcheck = true;
+		}
+		if (!(ipcheck || portcheck))
+			Connect(cIP, cPort);
 		display();
 	}
 	return 0;
@@ -132,7 +147,7 @@ int tsock::display()
 		EC = recv(Connection.back(), servermsg, 100, 0);
 		msg = servermsg;
 		cIP = msg.substr(0, msg.find(' '));
-		msg.erase(0, cIP.size()+1);
+		msg.erase(0, cIP.size() + 1);
 		cPort = msg.substr(0, msg.find(' '));
 		msg.erase(0, cPort.size() + 1);
 
@@ -141,7 +156,7 @@ int tsock::display()
 		{
 			// Confirmation message sent to the client
 			cout << "Message received from: " << cIP << endl
-				<< "Sender's Port: "<< cPort <<endl
+				<< "Sender's Port: " << cPort << endl
 				<< "Message: " << msg << endl;
 
 			// Error check
@@ -153,8 +168,14 @@ int tsock::display()
 				return 1;
 			}
 		}
-		else if (EC == 0)
+		else if (EC == 0) {
 			cout << "Connection closing:\n";
+			for (int i = 0; i < ClientsInfo.size(); i++) {
+				if (cPort == ClientsInfo[i].at(1)) {
+					Terminate(i+1);
+				}
+			}
+		}
 	} while (EC > 0);
 	return 0;
 }
@@ -247,25 +268,25 @@ int tsock::Connect(string dest, string prt)
 
 	// A vector holding all clients Ip Address and port numbers
 	ClientsInfo.push_back(temp);
-
+	send(ClientSock.back(), (IPADD + ' ' + Serverport + ' ').c_str(), 100, 0);
 	return 0;
 }
 
 // Displays a list of currently connected clients
 void tsock::List()
 {
-	cout << "Id:" << setw(13) << "IP Adress"
-		<< setw(13) << "Port No." << endl;
+	cout << "Id:" << setw(16) << "IP Adress"
+		<< setw(16) << "Port No." << endl;
 
 	for (int i = 0; i < ClientsInfo.size(); i++) {
 		cout << " " << i + 1 << ":" << setw(13);
 
 		// Prints IP addresses and port numbers
 		for (int j = 0; j < ClientsInfo[i].size(); j++)
-			cout << setw(13) << ClientsInfo[i][j];
+			cout << setw(16) << ClientsInfo[i][j];
 
 	}
-	cout << endl << endl;
+	cout << endl ;
 
 }
 
@@ -288,7 +309,7 @@ int tsock::Terminate(int id)
 		return 1;
 	}
 
-	// Deletes the selectes connection from ClientSock and ClientsInfo vectors
+	// Deletes the selects connection from ClientSock and ClientsInfo vectors
 	closesocket(ClientSock.at(id - 1));
 	ClientSock.erase(ClientSock.begin() + id - 1);
 	ClientsInfo.erase(ClientsInfo.begin() + id - 1);
@@ -299,7 +320,7 @@ int tsock::Terminate(int id)
 // Sends a message to a selected client
 int tsock::Send(int id, string message)
 {
-	string newmsg = IPADD +  ' ' + Serverport + ' ' + message;
+	string newmsg = IPADD + ' ' + Serverport + ' ' + message;
 	if (id > ClientSock.size() || id == 0)
 	{
 		cout << "sorry no such client exists\n";
@@ -316,7 +337,7 @@ int tsock::Send(int id, string message)
 		return 1;
 	}
 
-	cout << "Message sent to connection: " << id <<"\n\n";
+	cout << "Message sent to connection: " << id << "\n\n";
 	return 0;
 }
 
@@ -347,7 +368,7 @@ int tsock::Exit()
 			EC = shutdown(Connection.at(i), SD_SEND);
 			if (EC == SOCKET_ERROR)
 			{
-				cout << "One of the servers shutdown process has failed: " << WSAGetLastError() << endl;
+				cout <<"server socket: " << i << "has failed to shutdown:" << WSAGetLastError() << endl;
 				closesocket(Connection.at(i));
 			}
 		}
@@ -358,4 +379,3 @@ int tsock::Exit()
 	WSACleanup();
 	return 0;
 }
-
