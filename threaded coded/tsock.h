@@ -17,11 +17,14 @@ using namespace std;
 class tsock
 {
 public:
+	// Initiations
 	tsock(string port);
 	int Server_init();
 	int serverListen();
 	int serverAccept();
 	int display();
+
+	// Client prompts
 	void Help();
 	void Myip();
 	void Myport();
