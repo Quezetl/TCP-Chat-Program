@@ -1,0 +1,6 @@
+﻿  TCP Client Server App.cpp
+  tsock.cpp
+C:\Users\bjsbe\Documents\GitHub\tsock.cpp(30,7): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\bjsbe\Documents\GitHub\tsock.cpp(75,51): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
+  TCP Client Server App.vcxproj -> C:\Users\bjsbe\Documents\GitHub\x64\Debug\TCP Client Server App.exe

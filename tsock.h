@@ -1,3 +1,4 @@
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -5,10 +6,11 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <istream>
 #include <Windows.h>
 #include <ws2tcpip.h>
 #include <vector>
+#include <iomanip>
+#include <stdio.h>
 
 #pragma comment(lib, "Ws2_32.lib")
 using namespace std;
@@ -16,11 +18,14 @@ using namespace std;
 class tsock
 {
 public:
+	// Initiations
 	tsock(string port);
 	int Server_init();
 	int serverListen();
 	int serverAccept();
 	int display();
+
+	// Client prompts
 	void Help();
 	void Myip();
 	void Myport();
@@ -35,20 +40,25 @@ protected:
 private:
 	int							EC;
 	int							sendEC;
-	char					   *msg[100];
+	int							offset;
 	char						servermsg[100];
 	string						Clientport;
 	string						Serverport;
-	addrinfo				   *sRes,
-							   *cRes,
-							   *cPtr,
-							   *sPtr,
-								sHint,
-								cHint;
+	string						IPADD;
+	string						line;
+	string						search0;
+	string						cIP;
+	string						cPort;
+	string						msg;
+	ifstream					IPFile;
+	addrinfo* sRes,
+		* cRes,
+		* cPtr,
+		* sPtr,
+		sHint,
+		cHint;
 	SOCKET						Listen;
 	vector<SOCKET>				Connection;
 	vector<SOCKET>				ClientSock;
 	vector<vector<string>>		ClientsInfo;
-
 };
-

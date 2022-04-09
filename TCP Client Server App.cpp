@@ -3,42 +3,41 @@
 #include <iostream>
 #include <string>
 #include <thread>
-#include <chrono>
 
 using namespace std;
 
-int Run(string &response, string choice, tsock &App);
-int accepting(tsock App)
-{
-    App.serverAccept();
-    return 0;
-}
+int Run(string& response, string choice, tsock& App);
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
+    tsock App(argv[1]);
     string response;
     string choice;
     bool quit = false;
-    tsock App("27015");
     App.Server_init();
     App.serverListen();
-    do
+    thread worker1(&tsock::serverAccept, &App);
+    thread worker2(&tsock::serverAccept, &App);
+
+    while (!quit)
     {
-        thread worker(accepting, App);
         getline(cin, response);
         choice = response.substr(0, response.find(' '));
-        response.erase(0,choice.size()+1);
+        response.erase(0, choice.size() + 1);
         quit = Run(response, choice, App);
-        worker.detach();
-    } while (!quit);
+        
+        terminate();
+    }
 
+    worker1.join();
+    worker2.join();
     return 0;
 }
 
-int Run(string &response, string choice, tsock &App)
+int Run(string& response, string choice, tsock& App)
 {
     string first = response.substr(0, response.find(' '));
-    response.erase(0, first.size()+1);
+    response.erase(0, first.size() + 1);
     if (choice == "accept")
         App.serverAccept();
     if (choice == "help")

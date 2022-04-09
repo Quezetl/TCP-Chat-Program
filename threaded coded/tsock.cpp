@@ -63,20 +63,6 @@ int tsock::Server_init()
 		return 1;
 	}
 
-	//char ipstringbuffer[46];
-	//DWORD ipbufferlength = 46;
-	//DWORD dwRetval;
-
-	//struct sockaddr_in* sockaddr_ipv4;
-	//struct addrinfo* result = NULL;
-	//struct addrinfo* ptr = NULL;
-	//struct addrinfo hints;
-
-	//dwRetval = getaddrinfo(NULL, Serverport.c_str(), &hints, &result);
-	//sockaddr_ipv4 = (struct sockaddr_in*)ptr->ai_addr;
-	//printf("\tIPv4 address %s\n", inet_ntoa(sockaddr_ipv4->sin_addr)); 
-
-
 	freeaddrinfo(sRes);
 	return 0;
 }
@@ -125,7 +111,7 @@ int tsock::display()
 		if (EC > 0)
 		{
 			// Confirmation message sent to the client
-			cout << setw(10) << "Message:" << servermsg << endl;
+			cout << "Message:" << setw(10) <<  servermsg << endl;
 
 			// Error check
 			sendEC = send(Connection.back(), "Message Received:", EC, 0);
